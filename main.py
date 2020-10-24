@@ -17,9 +17,8 @@ class VoiceError(Exception):
 
 
 class VoiceState:
-    def __init__(self, bot: commands.Bot, ctx: commands.Context):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self._ctx = ctx
 
         self.voice = None
 
@@ -67,7 +66,7 @@ class Music(commands.Cog):
     def get_voice_state(self, ctx: commands.Context):
         state = self.voice_states.get(ctx.guild.id)
         if not state:
-            state = VoiceState(self.bot, ctx)
+            state = VoiceState(self.bot)
             self.voice_states[ctx.guild.id] = state
 
         return state
@@ -139,17 +138,21 @@ class Music(commands.Cog):
         if not before.channel:
             return
 
+        if before.channel is None or before.channel == after.channel:
+            return
+
         guild_id = before.channel.guild.id
-        if self.voice_states.get(guild_id):
-            voice_state = self.voice_states[guild_id]
-            if not after.channel:
-                del self.voice_states[guild_id]
-            else:
-                if before.channel == after.channel:
-                    return
-                if voice_state.voice:
-                    await voice_state.stop()
-                voice_state.voice = await after.channel.connect()
+        if not self.voice_states.get(guild_id):
+            state = VoiceState(self.bot)
+            self.voice_states[guild_id] = state
+
+        voice_state = self.voice_states[guild_id]
+
+        await voice_state.stop()
+        if not after.channel:
+            del self.voice_states[guild_id]
+        else:
+            voice_state.voice = await after.channel.connect()
 
 
 bot = commands.Bot("ni", description="97")
