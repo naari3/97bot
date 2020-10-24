@@ -22,7 +22,6 @@ class VoiceState:
         self._ctx = ctx
 
         self.voice = None
-        self.next = asyncio.Event()
 
         self.audio_player = bot.loop.create_task(self.audio_player_task())
 
@@ -32,7 +31,6 @@ class VoiceState:
     async def audio_player_task(self):
         while True:
             await asyncio.sleep(0.001)
-            # self.next.clear()
 
             if self.voice is None:
                 continue
@@ -42,9 +40,7 @@ class VoiceState:
 
             source = discord.FFmpegPCMAudio("test.wav")
 
-            # self.voice.play(source, after=self.play_next)
             self.voice.play(source, after=self.catch_error)
-            # await self.next.wait()
 
     def catch_error(self, error=None):
         if error:
@@ -123,12 +119,20 @@ class Music(commands.Cog):
         before: discord.VoiceState,
         after: discord.VoiceState,
     ):
-        if (
-            self.bot.user.id == member.id
-            and after.channel is None
-            and self.voice_states[before.channel.guild.id]
-        ):
-            del self.voice_states[before.channel.guild.id]
+        if self.bot.user.id != member.id:
+            return
+
+        if not before.channel:
+            return
+
+        guild_id = before.channel.guild.id
+        if self.voice_states[guild_id]:
+            if not after.channel:
+                del self.voice_states[guild_id]
+            else:
+                if self.voice_states[guild_id].voice:
+                    await self.voice_states[guild_id].voice.stop()
+                self.voice_states[guild_id].voice = await after.connect()
 
 
 bot = commands.Bot("ni", description="97")
