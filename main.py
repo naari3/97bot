@@ -23,6 +23,8 @@ class VoiceState:
 
         self.voice = None
 
+        self.song_index = 1
+
         self.audio_player = bot.loop.create_task(self.audio_player_task())
 
     def __del__(self):
@@ -38,13 +40,18 @@ class VoiceState:
             if self.voice.is_playing():
                 continue
 
-            source = discord.FFmpegPCMAudio("test.wav")
+            source = self.choose_song()
 
             self.voice.play(source, after=self.catch_error)
 
     def catch_error(self, error=None):
         if error:
             raise VoiceError(str(error))
+
+    def choose_song(self):
+        if self.song_index == 1:
+            return discord.FFmpegPCMAudio("test.wav")
+        return discord.FFmpegPCMAudio("test2.wav")
 
     async def stop(self):
         if self.voice:
@@ -83,16 +90,23 @@ class Music(commands.Cog):
     ):
         await ctx.send("发生错误: {}".format(str(error)))
 
-    @commands.command(name="join", aliases=["hao"], invoke_without_subcommand=True)
+    @commands.command(
+        name="join", aliases=["hao", "hao2"], invoke_without_subcommand=True
+    )
     async def _join(self, ctx: commands.Context):
         """Joins a voice channel."""
+
+        if ctx.invoked_with == "hao":
+            ctx.voice_state.song_index = 1
+        if ctx.invoked_with == "hao2":
+            ctx.voice_state.song_index = 2
 
         destination = ctx.author.voice.channel
         if ctx.voice_state.voice:
             await ctx.voice_state.voice.move_to(destination)
             return
-
-        ctx.voice_state.voice = await destination.connect()
+        else:
+            ctx.voice_state.voice = await destination.connect()
 
     @commands.command(name="leave", aliases=["disconnect"])
     @commands.has_permissions(manage_guild=True)
@@ -126,13 +140,16 @@ class Music(commands.Cog):
             return
 
         guild_id = before.channel.guild.id
-        if self.voice_states[guild_id]:
+        if self.voice_states.get(guild_id):
+            voice_state = self.voice_states[guild_id]
             if not after.channel:
                 del self.voice_states[guild_id]
             else:
-                if self.voice_states[guild_id].voice:
-                    await self.voice_states[guild_id].voice.stop()
-                self.voice_states[guild_id].voice = await after.connect()
+                if before.channel == after.channel:
+                    return
+                if voice_state.voice:
+                    await voice_state.stop()
+                voice_state.voice = await after.channel.connect()
 
 
 bot = commands.Bot("ni", description="97")
