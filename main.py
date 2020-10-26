@@ -48,9 +48,7 @@ class VoiceState:
             raise VoiceError(str(error))
 
     def choose_song(self):
-        if self.song_index == 1:
-            return discord.FFmpegPCMAudio("test.wav")
-        return discord.FFmpegPCMAudio("test2.wav")
+        return discord.FFmpegPCMAudio(f"test{self.song_index}.wav")
 
     async def stop(self):
         if self.voice:
@@ -90,15 +88,19 @@ class Music(commands.Cog):
         await ctx.send("发生错误: {}".format(str(error)))
 
     @commands.command(
-        name="join", aliases=["hao", "hao2"], invoke_without_subcommand=True
+        name="join",
+        aliases=["hao", "hao1", "hao2", "hao3", "hao4"],
+        invoke_without_subcommand=True,
     )
     async def _join(self, ctx: commands.Context):
         """Joins a voice channel."""
 
-        if ctx.invoked_with == "hao":
-            ctx.voice_state.song_index = 1
-        if ctx.invoked_with == "hao2":
-            ctx.voice_state.song_index = 2
+        idx_str = ctx.invoked_with[-1]
+        if idx_str == "t":
+            song_index = 1
+        else:
+            song_index = int(idx_str)
+        ctx.voice_state.song_index = song_index
 
         destination = ctx.author.voice.channel
         if ctx.voice_state.voice:
