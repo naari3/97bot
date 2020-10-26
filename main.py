@@ -96,7 +96,7 @@ class Music(commands.Cog):
         """Joins a voice channel."""
 
         idx_str = ctx.invoked_with[-1]
-        if idx_str == "t":
+        if idx_str == "o":
             song_index = 1
         else:
             song_index = int(idx_str)
