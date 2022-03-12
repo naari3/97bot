@@ -95,7 +95,7 @@ class Music(commands.Cog):
     async def _join(self, ctx: commands.Context):
         """Joins a voice channel."""
 
-        song_name = ctx.invoked_with[2:]
+        song_name = ctx.invoked_with
         if song_name == "hao":
             song_name = "hao1"
 
