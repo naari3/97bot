@@ -22,7 +22,7 @@ class VoiceState:
 
         self.voice = None
 
-        self.song_index = 1
+        self.song_name = "hao1"
 
         self.audio_player = bot.loop.create_task(self.audio_player_task())
 
@@ -48,7 +48,7 @@ class VoiceState:
             raise VoiceError(str(error))
 
     def choose_song(self):
-        return discord.FFmpegPCMAudio(f"test{self.song_index}.wav")
+        return discord.FFmpegPCMAudio(f"bgm/{self.song_name}.wav")
 
     async def stop(self):
         if self.voice:
@@ -89,20 +89,17 @@ class Music(commands.Cog):
 
     @commands.command(
         name="join",
-        aliases=["hao", "hao1", "hao2", "hao3", "hao4", "arab"],
+        aliases=["hao", "hao1", "hao2", "hao3", "hao4", "arab", "rag", "cart", "pari"],
         invoke_without_subcommand=True,
     )
     async def _join(self, ctx: commands.Context):
         """Joins a voice channel."""
 
-        idx_str = ctx.invoked_with[-1]
-        if idx_str == "o":
-            song_index = 1
-        elif idx_str == "b":
-            song_index = 5
-        else:
-            song_index = int(idx_str)
-        ctx.voice_state.song_index = song_index
+        song_name = ctx.invoked_with[2:]
+        if song_name == "hao":
+            song_name = "hao1"
+
+        ctx.voice_state.song_name = song_name
 
         destination = ctx.author.voice.channel
         if ctx.voice_state.voice:
