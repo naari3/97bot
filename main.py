@@ -89,7 +89,7 @@ class Music(commands.Cog):
 
     @commands.command(
         name="join",
-        aliases=["hao", "hao1", "hao2", "hao3", "hao4", "arab", "rag", "cart", "pari"],
+        aliases=["hao", "hao1", "hao2", "hao3", "hao4", "arab", "rag", "cart", "pari", "wind"],
         invoke_without_subcommand=True,
     )
     async def _join(self, ctx: commands.Context):
