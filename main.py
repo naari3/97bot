@@ -89,7 +89,7 @@ class Music(commands.Cog):
 
     @commands.command(
         name="join",
-        aliases=["hao", "hao1", "hao2", "hao3", "hao4", "arab", "rag", "cart", "pari", "wind"],
+        aliases=["hao", "hao1", "hao2", "hao3", "hao4", "arab", "rag", "cart", "pari", "wind", "fdc", "fly"],
         invoke_without_subcommand=True,
     )
     async def _join(self, ctx: commands.Context):
@@ -98,6 +98,8 @@ class Music(commands.Cog):
         song_name = ctx.invoked_with
         if song_name == "hao":
             song_name = "hao1"
+        if song_name == "fly":
+            song_name = "fdc"
 
         ctx.voice_state.song_name = song_name
 
