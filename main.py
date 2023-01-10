@@ -169,12 +169,13 @@ class Music(commands.Cog):
 
 
 bot = commands.Bot("ni", description="97", intents=discord.Intents.all())
-bot.add_cog(Music(bot))
-
 
 @bot.event
 async def on_ready():
     print("Logged in as:\n{0.user.name}\n{0.user.id}".format(bot))
 
+async def main():
+    await bot.add_cog(Music(bot))
+    await bot.start(TOKEN)
 
-bot.run(TOKEN)
+asyncio.run(main())
