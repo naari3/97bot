@@ -168,7 +168,7 @@ class Music(commands.Cog):
             voice_state.voice = await after.channel.connect()
 
 
-bot = commands.Bot("ni", description="97")
+bot = commands.Bot("ni", description="97", intents=discord.Intents.all())
 bot.add_cog(Music(bot))
 
 
